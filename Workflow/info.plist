@@ -136,89 +136,22 @@
 				<integer>68</integer>
 				<key>script</key>
 				<string>function run(argv) {
-    // Get the type of tab passed in as the first argument
-    var type = argv[0];
-
-    // If the type is "error", then return immediately 
-    // without activating Arc and selecting a tab
-    if (type == "error") {
+    // Check if this is an error argument
+    if (argv[0] == "error") {
         return;
     }
 
-    // Get a reference to the Arc application, since we'll be selecting a tab below
-    var arc = Application('Arc');
+    // Get a reference to the Dia application
+    var dia = Application('Dia');
 
-    // Determine if the type is "full" or "topTab" or "space"
-    if (type == "full") {
-        // Parse the remaining arguments for the window, space, and tab
-        var i = argv[1];
-        var j = argv[2];
-        var k = argv[3];
+    // Parse the arguments for window and tab indices
+    var windowIndex = argv[0];
+    var tabIndex = argv[1];
 
-        if (envVar("close_tab") == "1") {
-            // Close the specified tab in the Arc browser
-            arc.windows[i].spaces[j].tabs[k].close();
-            return;
-        }
-
-        // **Select the specified tab first (before focusing window)**
-        arc.windows[i].spaces[j].tabs[k].select();
-
-        // Make Arc the focused application
-        arc.activate();
-
-        // **Focus the window after tab selection**
-        focusWindow(i);
-    } else if (type == "topTab") {
-        // Parse the remaining arguments for the window and tab (no space)
-        var i = argv[1];
-        var k = argv[2];
-
-        if (envVar("close_tab") == "1") {
-            // Close the specified tab in the Arc browser
-            arc.windows[i].tabs[k].close();
-            return;
-        }
-
-        // **Select the specified tab first (before focusing window)**
-        arc.windows[i].tabs[k].select();
-
-        // Make Arc the focused application
-        arc.activate();
-
-        // **Focus the window after tab selection**
-        focusWindow(i);
-    } else if (type == "space") {
-        // Parse the remining arguments for the window and space (no tab)
-        var i = argv[1];
-        var j = argv[2];
-
-        // Make Arc the focused application
-        arc.activate();
-
-        arc.windows[i].spaces[j].focus();
-
-        // Bring the selected window to the front
-        focusWindow(i);
-
-        // Delay briefly, to let the focus change
-        // delay(0.1);
-    }
+    // Focus the tab (this automatically brings the window forward)
+    dia.windows[windowIndex].tabs[tabIndex].focus();
 
     return;
-}
-
-function focusWindow(i)
-{
-    var arcProcess = Application('System Events').processes['Arc'];
-    arcProcess.windows[i].actions['AXRaise'].perform();
-}
-
-function envVar(varName) {
-    return $.NSProcessInfo
-        .processInfo
-        .environment
-        .objectForKey(varName).js;
 }</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
