@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.may-june-july.DiaBrowserCompanion</string>
+	<key>category</key>
+	<string>Tools</string>
+	<key>connections</key>
+	<dict>
+		<key>41CD4A20-6BED-47F3-9629-31D93416B949</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>7E3CAA8C-DCDA-438A-AE84-ABD4523BEFAC</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>7E3CAA8C-DCDA-438A-AE84-ABD4523BEFAC</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>D2F163C8-B6C5-4064-B9DB-F414C04E7136</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>May June July</string>
+	<key>description</key>
+	<string></string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Dia Browser Companion</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>keyword</key>
+				<string>{var:search_keyword}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<false/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>2</integer>
+				<key>runningsubtext</key>
+				<string>Loading data…</string>
+				<key>script</key>
+				<string>./scripts/list_tabs.js "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Search for tabs in Dia…</string>
+				<key>title</key>
+				<string>Search Dia</string>
+				<key>type</key>
+				<integer>11</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>7E3CAA8C-DCDA-438A-AE84-ABD4523BEFAC</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>2</integer>
+				<key>hotmod</key>
+				<integer>1441792</integer>
+				<key>hotstring</key>
+				<string>D</string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>41CD4A20-6BED-47F3-9629-31D93416B949</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>script</key>
+				<string>function run(argv) {
+    // Get the type of tab passed in as the first argument
+    var type = argv[0];
+
+    // If the type is "error", then return immediately 
+    // without activating Arc and selecting a tab
+    if (type == "error") {
+        return;
+    }
+
+    // Get a reference to the Arc application, since we'll be selecting a tab below
+    var arc = Application('Arc');
+
+    // Determine if the type is "full" or "topTab" or "space"
+    if (type == "full") {
+        // Parse the remaining arguments for the window, space, and tab
+        var i = argv[1];
+        var j = argv[2];
+        var k = argv[3];
+
+        if (envVar("close_tab") == "1") {
+            // Close the specified tab in the Arc browser
+            arc.windows[i].spaces[j].tabs[k].close();
+            return;
+        }
+
+        // **Select the specified tab first (before focusing window)**
+        arc.windows[i].spaces[j].tabs[k].select();
+
+        // Make Arc the focused application
+        arc.activate();
+
+        // **Focus the window after tab selection**
+        focusWindow(i);
+    } else if (type == "topTab") {
+        // Parse the remaining arguments for the window and tab (no space)
+        var i = argv[1];
+        var k = argv[2];
+
+        if (envVar("close_tab") == "1") {
+            // Close the specified tab in the Arc browser
+            arc.windows[i].tabs[k].close();
+            return;
+        }
+
+        // **Select the specified tab first (before focusing window)**
+        arc.windows[i].tabs[k].select();
+
+        // Make Arc the focused application
+        arc.activate();
+
+        // **Focus the window after tab selection**
+        focusWindow(i);
+    } else if (type == "space") {
+        // Parse the remining arguments for the window and space (no tab)
+        var i = argv[1];
+        var j = argv[2];
+
+        // Make Arc the focused application
+        arc.activate();
+
+        arc.windows[i].spaces[j].focus();
+
+        // Bring the selected window to the front
+        focusWindow(i);
+
+        // Delay briefly, to let the focus change
+        // delay(0.1);
+    }
+
+    return;
+}
+
+function focusWindow(i)
+{
+    var arcProcess = Application('System Events').processes['Arc'];
+    arcProcess.windows[i].actions['AXRaise'].perform();
+}
+
+function envVar(varName) {
+    return $.NSProcessInfo
+        .processInfo
+        .environment
+        .objectForKey(varName).js;
+}</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>7</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>D2F163C8-B6C5-4064-B9DB-F414C04E7136</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string></string>
+	<key>uidata</key>
+	<dict>
+		<key>41CD4A20-6BED-47F3-9629-31D93416B949</key>
+		<dict>
+			<key>xpos</key>
+			<real>30</real>
+			<key>ypos</key>
+			<real>165</real>
+		</dict>
+		<key>7E3CAA8C-DCDA-438A-AE84-ABD4523BEFAC</key>
+		<dict>
+			<key>xpos</key>
+			<real>210</real>
+			<key>ypos</key>
+			<real>165</real>
+		</dict>
+		<key>D2F163C8-B6C5-4064-B9DB-F414C04E7136</key>
+		<dict>
+			<key>note</key>
+			<string>Activate Tab</string>
+			<key>xpos</key>
+			<real>595</real>
+			<key>ypos</key>
+			<real>165</real>
+		</dict>
+	</dict>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>diatabs</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<false/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Search Keyword</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>search_keyword</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>tokenized</string>
+				<key>pairs</key>
+				<array>
+					<array>
+						<string>Tokenized</string>
+						<string>tokenized</string>
+					</array>
+					<array>
+						<string>Substring</string>
+						<string>substring</string>
+					</array>
+				</array>
+			</dict>
+			<key>description</key>
+			<string>Under Tokenized Mode ‘My Family Photos’ will match with the queries ‘My Family Photos’, ‘Photos Family’, ‘Ph Fa’. 
+
+Substring Mode handles Chinese and Japanese better — allowing query ‘東京大学’ to match ‘公式ページ東京大学’ but not ‘東京理科大学’.</string>
+			<key>label</key>
+			<string>Match Mode</string>
+			<key>type</key>
+			<string>popupbutton</string>
+			<key>variable</key>
+			<string>search_method</string>
+		</dict>
+	</array>
+	<key>version</key>
+	<string></string>
+	<key>webaddress</key>
+	<string>https://github.com/April-June-August/Alfred--Dia-Browser-Companion</string>
+</dict>
+</plist>
