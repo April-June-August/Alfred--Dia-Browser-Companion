@@ -33,6 +33,39 @@
 				<key>vitoclose</key>
 				<false/>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>522958EE-1608-4869-B2A8-5837036C3D85</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>ACEFD9D4-85F0-4319-9F58-C2475CA965C2</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>ACEFD9D4-85F0-4319-9F58-C2475CA965C2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>522958EE-1608-4869-B2A8-5837036C3D85</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
 		</array>
 	</dict>
 	<key>createdby</key>
@@ -167,6 +200,33 @@
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>522958EE-1608-4869-B2A8-5837036C3D85</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.junction</string>
+			<key>uid</key>
+			<string>ACEFD9D4-85F0-4319-9F58-C2475CA965C2</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
@@ -179,6 +239,15 @@
 			<key>ypos</key>
 			<real>165</real>
 		</dict>
+		<key>522958EE-1608-4869-B2A8-5837036C3D85</key>
+		<dict>
+			<key>note</key>
+			<string>Copy title or URL</string>
+			<key>xpos</key>
+			<real>595</real>
+			<key>ypos</key>
+			<real>320</real>
+		</dict>
 		<key>7E3CAA8C-DCDA-438A-AE84-ABD4523BEFAC</key>
 		<dict>
 			<key>xpos</key>
@@ -186,10 +255,17 @@
 			<key>ypos</key>
 			<real>165</real>
 		</dict>
+		<key>ACEFD9D4-85F0-4319-9F58-C2475CA965C2</key>
+		<dict>
+			<key>xpos</key>
+			<real>445</real>
+			<key>ypos</key>
+			<real>350</real>
+		</dict>
 		<key>D2F163C8-B6C5-4064-B9DB-F414C04E7136</key>
 		<dict>
 			<key>note</key>
-			<string>Activate Tab</string>
+			<string>Activate tab</string>
 			<key>xpos</key>
 			<real>595</real>
 			<key>ypos</key>
