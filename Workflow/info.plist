@@ -25,6 +25,16 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
+				<string>F58A9612-3C17-4D13-A0B0-EE69C34E055D</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>D2F163C8-B6C5-4064-B9DB-F414C04E7136</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -67,6 +77,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>F58A9612-3C17-4D13-A0B0-EE69C34E055D</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>D2F163C8-B6C5-4064-B9DB-F414C04E7136</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>May June July</string>
@@ -78,6 +101,16 @@
 	<string>Dia Browser Companion</string>
 	<key>objects</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict/>
+			<key>type</key>
+			<string>alfred.workflow.utility.junction</string>
+			<key>uid</key>
+			<string>F58A9612-3C17-4D13-A0B0-EE69C34E055D</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -106,7 +139,7 @@
 				<key>runningsubtext</key>
 				<string>Loading data…</string>
 				<key>script</key>
-				<string>./scripts/list_tabs.js "$1"</string>
+				<string>/usr/bin/osascript -l JavaScript ./scripts/list_tabs.js "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -168,30 +201,13 @@
 				<key>escaping</key>
 				<integer>68</integer>
 				<key>script</key>
-				<string>function run(argv) {
-    // Check if this is an error argument
-    if (argv[0] == "error") {
-        return;
-    }
-
-    // Get a reference to the Dia application
-    var dia = Application('Dia');
-
-    // Parse the arguments for window and tab indices
-    var windowIndex = argv[0];
-    var tabIndex = argv[1];
-
-    // Focus the tab (this automatically brings the window forward)
-    dia.windows[windowIndex].tabs[tabIndex].focus();
-
-    return;
-}</string>
+				<string>/usr/bin/osascript -l JavaScript ./scripts/select_item.js "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>type</key>
-				<integer>7</integer>
+				<integer>11</integer>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.action.script</string>
@@ -220,6 +236,8 @@
 			<integer>3</integer>
 		</dict>
 		<dict>
+			<key>config</key>
+			<dict/>
 			<key>type</key>
 			<string>alfred.workflow.utility.junction</string>
 			<key>uid</key>
@@ -271,9 +289,73 @@
 			<key>ypos</key>
 			<real>165</real>
 		</dict>
+		<key>F58A9612-3C17-4D13-A0B0-EE69C34E055D</key>
+		<dict>
+			<key>xpos</key>
+			<real>445</real>
+			<key>ypos</key>
+			<real>100</real>
+		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<true/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string></string>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Include Profiles</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>includeProfiles</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<true/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string></string>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Include Pinned Tabs / Apps</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>includePinnedTabs</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<true/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string></string>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Include Unpinned Tabs</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>includeUnpinnedTabs</string>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
