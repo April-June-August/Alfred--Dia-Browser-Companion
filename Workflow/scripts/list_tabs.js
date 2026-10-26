@@ -67,57 +67,72 @@ function envBoolean(name, fallback) {
 }
 
 function collectSnapshot(dia, includeTabs) {
-    // Resolve every subsequent access by identity, not a mutable window position.
     var ids = dia.windows.id();
-    // Dia 1.53.0 reports index=0 for every window. The collection itself was
-    // verified front-to-back, including while hidden; keep that order on ties.
-    var windows = ids.map(function (id, position) {
-        var w = dia.windows.byId(id);
-        return {id: String(id), order: w.index(), originalOrder: position};
-    });
-    windows.sort(function (a, b) { return a.order - b.order || a.originalOrder - b.originalOrder; });
-    return windows.map(function (info, position) {
-        var w = dia.windows.byId(info.id);
-        var active = w.activeProfile();
-        var activeName = text(active.name());
-        var activeIndex = active.index();
-        var profiles = w.profiles();
-        var record = {
-            id: info.id, position: position, activeProfileName: activeName,
-            activeProfileIndex: activeIndex, profiles: []
+    if (ids.length === 0) return [];
+    var orders = dia.windows.index();
+    var names = dia.windows.profiles.name();
+    var indices = dia.windows.profiles.index();
+    var activeNames = dia.windows.activeProfile.name();
+    var activeIndices = dia.windows.activeProfile.index();
+    var tabIds, titles, urls, pinned;
+    if (includeTabs) {
+        // Nested bulk reads preserve each real window/profile's own tab list.
+        tabIds = dia.windows.profiles.tabs.id();
+        titles = dia.windows.profiles.tabs.title();
+        urls = dia.windows.profiles.tabs.url();
+        pinned = dia.windows.profiles.tabs.ispinned();
+        if (JSON.stringify(tabIds) !== JSON.stringify(dia.windows.profiles.tabs.id())) {
+            throw new Error("Dia's tabs changed while reading. Search again.");
+        }
+    }
+    // Never join fields using positions if their owning windows/profiles moved.
+    if (JSON.stringify(ids) !== JSON.stringify(dia.windows.id()) ||
+            JSON.stringify(names) !== JSON.stringify(dia.windows.profiles.name()) ||
+            JSON.stringify(indices) !== JSON.stringify(dia.windows.profiles.index())) {
+        throw new Error("Dia's windows or profiles changed while reading. Search again.");
+    }
+    var windowFields = [orders, names, indices, activeNames, activeIndices];
+    if (includeTabs) windowFields = windowFields.concat([tabIds, titles, urls, pinned]);
+    if (windowFields.some(function (field) { return !Array.isArray(field) || field.length !== ids.length; })) {
+        throw new Error("Dia returned an incomplete window snapshot. Search again.");
+    }
+    var records = ids.map(function (id, wi) {
+        if (!Array.isArray(names[wi]) || !Array.isArray(indices[wi]) || names[wi].length !== indices[wi].length) {
+            throw new Error("Dia returned an incomplete profile snapshot. Search again.");
+        }
+        if (includeTabs && [tabIds[wi], titles[wi], urls[wi], pinned[wi]].some(function (field) {
+            return !Array.isArray(field) || field.length !== names[wi].length;
+        })) throw new Error("Dia's profiles changed while reading. Search again.");
+        return {
+            id: String(id), order: orders[wi], position: wi,
+            activeProfileName: text(activeNames[wi]), activeProfileIndex: activeIndices[wi],
+            profiles: names[wi].map(function (name, pi) {
+                var tabs = [];
+                if (includeTabs) {
+                    var idsForProfile = tabIds[wi][pi];
+                    var profileTitles = titles[wi][pi];
+                    var profileUrls = urls[wi][pi];
+                    var profilePinned = pinned[wi][pi];
+                    if (!Array.isArray(idsForProfile) || [profileTitles, profileUrls, profilePinned].some(function (field) {
+                        return !Array.isArray(field) || field.length !== idsForProfile.length;
+                    })) throw new Error("Dia's tabs changed while reading. Search again.");
+                    var counts = Object.create(null), seen = Object.create(null);
+                    idsForProfile.forEach(function (id) { id = text(id); counts[id] = (counts[id] || 0) + 1; });
+                    idsForProfile.forEach(function (id, ti) {
+                        id = text(id);
+                        if (!id || seen[id]) return;
+                        seen[id] = true;
+                        tabs.push({id: id, title: text(profileTitles[ti]), url: text(profileUrls[ti]),
+                            isPinned: !!profilePinned[ti], ambiguous: counts[id] > 1});
+                    });
+                }
+                return {name: text(name), index: indices[wi][pi], tabs: tabs};
+            })
         };
-        profiles.forEach(function (p) {
-            var profile = {name: text(p.name()), index: p.index(), tabs: []};
-            if (includeTabs) {
-                // Dia defines this sequence as favorites, pinned tabs, window tabs.
-                // Read EACH window/profile: never clone the first window's tabs.
-                var tabs = p.tabs;
-                var tabIds = tabs.id();
-                var titles = tabs.title();
-                var urls = tabs.url();
-                var pinned = tabs.ispinned();
-                if ([titles, urls, pinned].some(function (a) { return a.length !== tabIds.length; })) {
-                    throw new Error("Dia's tabs changed while reading. Search again.");
-                }
-                // Detect same-length reorders between individual Apple Events too.
-                var checkedIds = tabs.id();
-                if (JSON.stringify(tabIds) !== JSON.stringify(checkedIds)) {
-                    throw new Error("Dia's tabs changed while reading. Search again.");
-                }
-                var seen = Object.create(null);
-                var counts = Object.create(null);
-                tabIds.forEach(function (id) { counts[text(id)] = (counts[text(id)] || 0) + 1; });
-                tabIds.forEach(function (id, i) {
-                    id = text(id);
-                    if (!id || seen[id]) return;
-                    seen[id] = true;
-                    profile.tabs.push({id: id, title: text(titles[i]), url: text(urls[i]), isPinned: !!pinned[i], ambiguous: counts[id] > 1});
-                });
-            }
-            record.profiles.push(profile);
-        });
-        return record;
     });
+    records.sort(function (a, b) { return a.order - b.order || a.position - b.position; });
+    records.forEach(function (record, position) { record.position = position; });
+    return records;
 }
 
 function buildItems(windows, query, config) {
